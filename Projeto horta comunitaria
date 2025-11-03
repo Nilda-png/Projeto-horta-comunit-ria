@@ -1,0 +1,405 @@
+ 1. Cria o banco de dados
+CREATE DATABASE IF NOT EXISTS horta_verde_viva;
+USE horta_verde_viva;
+
+-- 2. Tabela VOLUNTARIO
+CREATE TABLE VOLUNTARIO (
+    idVoluntario INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(100) NOT NULL,
+    contato VARCHAR(100)
+);
+
+-- 3. Tabela CANTEIRO
+CREATE TABLE CANTEIRO (
+    idCanteiro INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(50) NOT NULL UNIQUE,
+    caracteristicas VARCHAR(255)
+);
+
+-- 4. Tabela ESPECIE_PLANTA
+CREATE TABLE ESPECIE_PLANTA (
+    idPlanta INT PRIMARY KEY AUTO_INCREMENT,
+    nome_popular VARCHAR(50) NOT NULL UNIQUE,
+    nome_cientifico VARCHAR(100)
+);
+
+-- 5. Tabela INSTITUICAO
+CREATE TABLE INSTITUICAO (
+    idInstituicao INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(100) NOT NULL UNIQUE,
+    endereco VARCHAR(255),
+    contato VARCHAR(100)
+);
+
+-- 6. Tabela CULTIVO (Contém FKS para Voluntario, Canteiro e Planta)
+CREATE TABLE CULTIVO (
+    idCultivo INT PRIMARY KEY AUTO_INCREMENT,
+    data_plantio DATE NOT NULL,
+    quantidade_plantada_kg DECIMAL(5,2),
+    idVoluntario INT NOT NULL,
+    idCanteiro INT NOT NULL,
+    idPlanta INT NOT NULL,
+    
+    FOREIGN KEY (idVoluntario) REFERENCES VOLUNTARIO(idVoluntario),
+    FOREIGN KEY (idCanteiro) REFERENCES CANTEIRO(idCanteiro),
+    FOREIGN KEY (idPlanta) REFERENCES ESPECIE_PLANTA(idPlanta)
+);
+
+-- 7. Tabela COLHEITA (Contém FKS para Canteiro e Cultivo)
+CREATE TABLE COLHEITA (
+    idColheita INT PRIMARY KEY AUTO_INCREMENT,
+    data_colheita DATE NOT NULL,
+    quantidade_colhida_kg DECIMAL(5,2) NOT NULL,
+    idCanteiro INT NOT NULL,
+    idCultivo INT NOT NULL,
+    
+    FOREIGN KEY (idCanteiro) REFERENCES CANTEIRO(idCanteiro),
+    FOREIGN KEY (idCultivo) REFERENCES CULTIVO(idCultivo)
+);
+
+-- 8. Tabela DOACAO (Contém FKS para Colheita e Instituicao)
+CREATE TABLE DOACAO (
+    idDoacao INT PRIMARY KEY AUTO_INCREMENT,
+    data_doacao DATE NOT NULL,
+    quantidade_doada_kg DECIMAL(5,2) NOT NULL,
+    idColheita INT NOT NULL,
+    idInstituicao INT NOT NULL,
+    
+    FOREIGN KEY (idColheita) REFERENCES COLHEITA(idColheita),
+    FOREIGN KEY (idInstituicao) REFERENCES INSTITUICAO(idInstituicao)
+);
+
+    VOLUNTARIO ||--o{ CULTIVO : realiza
+    CANTEIRO ||--o{ CULTIVO : possui
+    ESPECIE_PLANTA ||--o{ CULTIVO : plantada_em
+
+    CULTIVO ||--o{ COLHEITA : gera
+
+    CANTEIRO }o--|| COLHEITA : ocorre_em
+
+    COLHEITA ||--o{ DOACAO : resulta_em
+    INSTITUICAO ||--o{ DOACAO : recebe
+
+    VOLUNTARIO {
+        int idVoluntario PK
+        string Nome
+        string Contato
+    }
+    CANTEIRO {
+        int idCanteiro PK
+        string Nome/Identificador
+        string Caracteristicas
+    }
+    ESPECIE_PLANTA {
+        int idPlanta PK
+        string Nome_Popular
+        string Nome_Cientifico
+    }
+    INSTITUICAO {
+        int idInstituicao PK
+        string Nome
+        string Endereco
+        string Contato
+    }
+    CULTIVO {
+        int idCultivo PK
+        date Data_Plantio
+        float Quantidade_Plantada_kg
+        int idVoluntario FK
+        int idCanteiro FK
+        int idPlanta FK
+    }
+    COLHEITA {
+        int idColheita PK
+        date Data_Colheita
+        float Quantidade_Colhida_kg
+        int idCanteiro FK
+        int idCultivo FK
+    }
+    DOACAO {
+        int idDoacao PK
+        date Data_Doacao
+        float Quantidade_Doada_kg
+        int idColheita FK
+        int idInstituicao FK
+    }
+    
+Coluna,Tipo,Observação
+idVoluntario,INT,PK
+nome,VARCHAR(100),
+contato,VARCHAR(100),
+
+Coluna,Tipo,Observação
+idCanteiro,INT,PK
+nome,VARCHAR(50),
+caracteristicas,VARCHAR(255),
+
+Coluna,Tipo,Observação
+idPlanta,INT,PK
+nome_popular,VARCHAR(50),
+nome_cientifico,VARCHAR(100),
+
+Coluna,Tipo,Observação
+idInstituicao,INT,PK
+nome,VARCHAR(100),
+endereco,VARCHAR(255),
+contato,VARCHAR(100),
+
+Coluna,Tipo,Observação
+idCultivo,INT,PK
+data_plantio,DATE,
+quantidade_plantada_kg,"DECIMAL(5,2)",
+idVoluntario,INT,FK (ref: VOLUNTARIO)
+idCanteiro,INT,FK (ref: CANTEIRO)
+idPlanta,INT,FK (ref: ESPECIE_PLANTA)
+
+Coluna,Tipo,Observação
+idColheita,INT,PK
+data_colheita,DATE,
+quantidade_colhida_kg,"DECIMAL(5,2)",
+idCanteiro,INT,FK (ref: CANTEIRO)
+idCultivo,INT,FK (ref: CULTIVO)
+
+Coluna,Tipo,Observação
+idDoacao,INT,PK
+data_doacao,DATE,
+quantidade_doada_kg,"DECIMAL(5,2)",
+idColheita,INT,FK (ref: COLHEITA)
+idInstituicao,INT,FK (ref: INSTITUICAO)
+
+-- 1. Cria o banco de dados
+CREATE DATABASE horta_verde_viva;
+
+-- Seleciona o banco de dados para uso
+USE horta_verde_viva;
+
+-- 1. Inserir em VOLUNTARIO
+INSERT INTO VOLUNTARIO (nome, contato) VALUES
+('Ana Silva', 'ana.silva@escola.br'),
+('Bruno Costa', 'bruno.c@escola.br'),
+('Carla Dias', 'carla.dias@escola.br');
+
+-- 2. Inserir em CANTEIRO
+INSERT INTO CANTEIRO (nome, caracteristicas) VALUES
+('Canteiro Norte', 'Tamanho: 10m², Sol pleno'),
+('Canteiro Sul', 'Tamanho: 5m², Meia sombra'),
+('Estufa de Mudas', 'Tamanho: 2m², Ambiente controlado');
+
+-- 3. Inserir em ESPECIE_PLANTA
+INSERT INTO ESPECIE_PLANTA (nome_popular, nome_cientifico) VALUES
+('Alface Crespa', 'Lactuca sativa'),
+('Tomate Cereja', 'Solanum lycopersicum'),
+('Salsa', 'Petroselinum crispum');
+
+-- 4. Inserir em INSTITUICAO
+INSERT INTO INSTITUICAO (nome, endereco, contato) VALUES
+('Abrigo Esperança', 'Rua A, 123', '3333-1111'),
+('Casa de Idosos Feliz', 'Av B, 45', '3333-2222'),
+('Creche Arco-Íris', 'Rua C, 900', '3333-3333');
+
+-- 5. Inserir em CULTIVO (Voluntario: 1, 2, 3; Canteiro: 1, 2, 1; Planta: 1, 2, 3)
+INSERT INTO CULTIVO (data_plantio, quantidade_plantada_kg, idVoluntario, idCanteiro, idPlanta) VALUES
+('2025-09-01', 0.15, 1, 1, 1), -- Ana plantou Alface no Canteiro Norte
+('2025-09-10', 0.20, 2, 2, 2), -- Bruno plantou Tomate no Canteiro Sul
+('2025-09-15', 0.10, 3, 1, 3); -- Carla plantou Salsa no Canteiro Norte
+
+-- 6. Inserir em COLHEITA (Canteiro: 1, 2, 1; Cultivo: 1, 2, 3)
+INSERT INTO COLHEITA (data_colheita, quantidade_colhida_kg, idCanteiro, idCultivo) VALUES
+('2025-10-01', 5.50, 1, 1), -- Colheita da Alface (Cultivo 1)
+('2025-11-05', 8.20, 2, 2), -- Colheita do Tomate (Cultivo 2)
+('2025-11-10', 3.00, 1, 3); -- Colheita da Salsa (Cultivo 3)
+
+-- 7. Inserir em DOACAO (Colheita: 1, 2, 1; Instituicao: 1, 2, 3)
+INSERT INTO DOACAO (data_doacao, quantidade_doada_kg, idColheita, idInstituicao) VALUES
+('2025-10-02', 2.50, 1, 1), -- Doação de Alface para Abrigo Esperança
+('2025-11-06', 4.10, 2, 2), -- Doação de Tomate para Casa de Idosos Feliz
+('2025-11-10', 3.00, 3, 3); -- Doação de Salsa para Creche Arco-Íris
+
+SELECT 
+    idVoluntario, 
+    nome, 
+    contato 
+FROM 
+    VOLUNTARIO;
+    
+   SELECT 
+    C.nome AS Nome_Canteiro, 
+    P.nome_popular AS Nome_Planta, 
+    T.data_plantio AS Data_Plantio
+FROM 
+    CULTIVO T
+JOIN 
+    CANTEIRO C ON T.idCanteiro = C.idCanteiro
+JOIN 
+    ESPECIE_PLANTA P ON T.idPlanta = P.idPlanta
+ORDER BY
+    C.nome, T.data_plantio;
+    
+    SELECT 
+    V.nome AS Nome_Voluntario, 
+    P.nome_popular AS Planta_Cultivada
+FROM 
+    CULTIVO T
+JOIN 
+    VOLUNTARIO V ON T.idVoluntario = V.idVoluntario
+JOIN 
+    ESPECIE_PLANTA P ON T.idPlanta = P.idPlanta
+ORDER BY
+    V.nome, P.nome_popular;
+    
+    SELECT 
+    H.data_colheita AS Data_Colheita, 
+    C.nome AS Nome_Canteiro, 
+    H.quantidade_colhida_kg
+FROM 
+    COLHEITA H
+JOIN 
+    CANTEIRO C ON H.idCanteiro = C.idCanteiro
+ORDER BY
+    H.data_colheita;
+    
+    SELECT 
+    I.nome AS Nome_Instituicao, 
+    SUM(D.quantidade_doada_kg) AS Total_Doado_kg
+FROM 
+    DOACAO D
+JOIN 
+    INSTITUICAO I ON D.idInstituicao = I.idInstituicao
+GROUP BY 
+    I.nome
+ORDER BY
+    Total_Doado_kg DESC;
+    
+  SELECT 
+    I.nome AS Instituicao, 
+    SUM(D.quantidade_doada_kg) AS Total_Quilos_Doados
+FROM 
+    DOACAO D
+JOIN 
+    INSTITUICAO I ON D.idInstituicao = I.idInstituicao
+GROUP BY 
+    I.nome 
+ORDER BY 
+    Total_Quilos_Doados DESC;
+    
+    SELECT 
+    C.nome AS Canteiro_Sem_Colheita, 
+    C.caracteristicas
+FROM 
+    CANTEIRO C
+LEFT JOIN 
+    COLHEITA H ON C.idCanteiro = H.idCanteiro
+WHERE 
+    H.idColheita IS NULL;
+    
+    SELECT 
+    V.nome AS Voluntario, 
+    COUNT(T.idCultivo) AS Numero_Cultivos
+FROM 
+    VOLUNTARIO V
+JOIN 
+    CULTIVO T ON V.idVoluntario = T.idVoluntario
+GROUP BY 
+    V.nome
+ORDER BY 
+    Numero_Cultivos DESC
+LIMIT 1; -- Limita ao voluntário com a contagem mais alta
+
+SELECT 
+    P.nome_popular AS Planta_Nao_Colhida,
+    T.data_plantio
+FROM 
+    ESPECIE_PLANTA P
+JOIN
+    CULTIVO T ON P.idPlanta = T.idPlanta
+LEFT JOIN 
+    COLHEITA H ON T.idCultivo = H.idCultivo
+WHERE 
+    H.idColheita IS NULL;
+    
+    SELECT 
+    D.data_doacao AS Data_Doacao, 
+    I.nome AS Nome_Instituicao, 
+    D.quantidade_doada_kg
+FROM 
+    DOACAO D
+JOIN 
+    INSTITUICAO I ON D.idInstituicao = I.idInstituicao
+WHERE 
+    D.data_doacao BETWEEN '2025-09-01' AND '2025-09-30'
+ORDER BY 
+    D.data_doacao;
+    
+    -- 01_modelo_fisico_ddl.sql
+-- Etapa 3 - Modelo Físico (MySQL)
+
+-- 1. Cria o banco de dados
+CREATE DATABASE IF NOT EXISTS horta_verde_viva;
+USE horta_verde_viva;
+
+-- 2. Tabela VOLUNTARIO
+CREATE TABLE VOLUNTARIO (
+    idVoluntario INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(100) NOT NULL,
+    contato VARCHAR(100)
+);
+
+-- 3. Tabela CANTEIRO
+CREATE TABLE CANTEIRO (
+    idCanteiro INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(50) NOT NULL UNIQUE,
+    caracteristicas VARCHAR(255)
+);
+
+-- 4. Tabela ESPECIE_PLANTA
+CREATE TABLE ESPECIE_PLANTA (
+    idPlanta INT PRIMARY KEY AUTO_INCREMENT,
+    nome_popular VARCHAR(50) NOT NULL UNIQUE,
+    nome_cientifico VARCHAR(100)
+);
+
+-- 5. Tabela INSTITUICAO
+CREATE TABLE INSTITUICAO (
+    idInstituicao INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(100) NOT NULL UNIQUE,
+    endereco VARCHAR(255),
+    contato VARCHAR(100)
+);
+
+-- 6. Tabela CULTIVO (Contém FKS para Voluntario, Canteiro e Planta)
+CREATE TABLE CULTIVO (
+    idCultivo INT PRIMARY KEY AUTO_INCREMENT,
+    data_plantio DATE NOT NULL,
+    quantidade_plantada_kg DECIMAL(5,2),
+    idVoluntario INT NOT NULL,
+    idCanteiro INT NOT NULL,
+    idPlanta INT NOT NULL,
+    
+    FOREIGN KEY (idVoluntario) REFERENCES VOLUNTARIO(idVoluntario),
+    FOREIGN KEY (idCanteiro) REFERENCES CANTEIRO(idCanteiro),
+    FOREIGN KEY (idPlanta) REFERENCES ESPECIE_PLANTA(idPlanta)
+);
+
+-- 7. Tabela COLHEITA (Contém FKS para Canteiro e Cultivo)
+CREATE TABLE COLHEITA (
+    idColheita INT PRIMARY KEY AUTO_INCREMENT,
+    data_colheita DATE NOT NULL,
+    quantidade_colhida_kg DECIMAL(5,2) NOT NULL,
+    idCanteiro INT NOT NULL,
+    idCultivo INT NOT NULL,
+    
+    FOREIGN KEY (idCanteiro) REFERENCES CANTEIRO(idCanteiro),
+    FOREIGN KEY (idCultivo) REFERENCES CULTIVO(idCultivo)
+);
+
+-- 8. Tabela DOACAO (Contém FKS para Colheita e Instituicao)
+CREATE TABLE DOACAO (
+    idDoacao INT PRIMARY KEY AUTO_INCREMENT,
+    data_doacao DATE NOT NULL,
+    quantidade_doada_kg DECIMAL(5,2) NOT NULL,
+    idColheita INT NOT NULL,
+    idInstituicao INT NOT NULL,
+    
+    FOREIGN KEY (idColheita) REFERENCES COLHEITA(idColheita),
+    FOREIGN KEY (idInstituicao) REFERENCES INSTITUICAO(idInstituicao)
+);
