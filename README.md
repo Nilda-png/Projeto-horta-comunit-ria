@@ -1,1 +1,1 @@
-# Projeto-horta-comunit-ria
+# Projeto-horta-comunitária
